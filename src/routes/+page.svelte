@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { getAnnotation, getDownloadURL, parseLabels, saveAnnotation } from '$lib'
+	import { getAnnotation, parseLabels, saveAnnotation } from '$lib'
 	import Inputs from '$lib/Inputs.svelte'
 
 	let images: FileList | undefined
-	let downloadURL: string | undefined
 
 	let labels = new Set<string>()
 	let current = {
@@ -52,10 +51,6 @@
 				nextImage(-1)
 				break
 
-			case 'Enter':
-				downloadURL = getDownloadURL()
-				break
-
 			default:
 				if (!e.key.match(/[1-9]/)) break
 
@@ -92,7 +87,8 @@
 			{labels}
 			onClick={label => toggleLabel(label)}
 			currentLabels={current.annotations}
-			bind:downloadURL
+			totalImages={images.length}
+			currentCount={current.index + 1}
 		/>
 		<div class="flex w-full">
 			<img
