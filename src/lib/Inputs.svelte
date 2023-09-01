@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { downloadAnnotations } from '$lib'
+
 	export let labels: Set<string>
 	export let currentLabels: string[]
 	export let onClick: (label: string) => void
-	export let downloadURL: string | undefined
+	export let totalImages: number
+	export let currentCount: number
 </script>
 
 <div class="flex flex-col gap-2 px-2 w-52">
@@ -24,16 +27,13 @@
 	{/each}
 
 	<div class="flex flex-col gap-2 mt-auto">
-		{#if downloadURL?.length}
-			<a
-				href={downloadURL}
-				on:click={() => (downloadURL = undefined)}
-				download
-				class="p-2 text-white transition rounded-lg bg-sky-600 hover:bg-sky-500"
-			>
-				Download
-			</a>
-		{/if}
+		<button
+			on:click={() => downloadAnnotations()}
+			class="p-2 text-white transition rounded-lg bg-sky-600 hover:bg-sky-500"
+		>
+			Export
+		</button>
+		<p>{currentCount} / {totalImages}</p>
 		<p>[arrows] → navigate</p>
 		<p>[enter] → submit</p>
 		<p>[esc] → clear files</p>
