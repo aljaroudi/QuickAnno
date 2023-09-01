@@ -12,7 +12,7 @@
 	}
 
 	function nextImage(offset: 1 | -1 = 1) {
-		saveAnnotation(current)
+		current.filename.length && saveAnnotation(current)
 		if (!images?.length) return
 
 		let index = current.index + offset
