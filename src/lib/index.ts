@@ -27,26 +27,26 @@ export function getAnnotation(filename: string): string[] | undefined {
 function getAnnotations(): Annotation[] {
 	const annotations: Annotation[] = []
 	for (let i = 0; i < localStorage.length; i++) {
-		const key = localStorage.key(i)
-		if (!key) continue
+		try {
+			const annotation = localStorage.getItem(localStorage.key(i)!)
+			const parsedAnnotation = JSON.parse(annotation!)
+			if (parsedAnnotation.annotations.length === 0) continue
 
-		const annotation = localStorage.getItem(key)
-		if (!annotation) continue
-
-		const parsedAnnotation = JSON.parse(annotation)
-		if (
-			!Object.hasOwn(parsedAnnotation, 'filename') ||
-			!Object.hasOwn(parsedAnnotation, 'annotations')
-		)
+			annotations.push(parsedAnnotation)
+		} catch (e) {
 			continue
-
-		annotations.push(parsedAnnotation)
+		}
 	}
 	return annotations
 }
 
-export function getDownloadURL(): string {
+export function downloadAnnotations() {
 	const annotations = getAnnotations()
 	const blob = new Blob([JSON.stringify(annotations)], { type: 'application/json' })
-	return URL.createObjectURL(blob)
+	const url = URL.createObjectURL(blob)
+	const a = document.createElement('a')
+	a.href = url
+	a.download = `annotations-${new Date().toLocaleString()}.json`
+	a.click()
+	URL.revokeObjectURL(url)
 }
