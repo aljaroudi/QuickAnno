@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getAnnotation, parseLabels, saveAnnotation } from '$lib'
+	import { downloadAnnotations, getAnnotation, parseLabels, saveAnnotation } from '$lib'
 	import Inputs from '$lib/Inputs.svelte'
 
 	let images: FileList | undefined
@@ -102,6 +102,7 @@
 			currentLabels={current.annotations}
 			totalImages={images.length}
 			currentCount={current.index + 1}
+			onExport={() => images && downloadAnnotations(images)}
 		/>
 		<div class="flex w-full">
 			<img
