@@ -98,7 +98,7 @@
 	<div class="flex justify-between w-full h-full">
 		<Inputs
 			{labels}
-			onClick={label => toggleLabel(label)}
+			onClick={toggleLabel}
 			currentLabels={current.annotations}
 			totalImages={images.length}
 			currentCount={current.index + 1}
