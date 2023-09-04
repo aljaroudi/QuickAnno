@@ -12,12 +12,12 @@ export async function parseLabels(files: FileList): Promise<Set<string> | undefi
 		.catch(() => undefined)
 }
 
-export function saveAnnotation(annotation: Annotation) {
+export function saveAnnotation({ filename, annotations }: Annotation) {
 	localStorage.setItem(
-		annotation.filename,
+		filename,
 		JSON.stringify({
-			filename: annotation.filename,
-			annotations: Array.from(annotation.annotations),
+			filename,
+			annotations: annotations.has('none') ? [] : Array.from(annotations),
 		})
 	)
 }
@@ -27,13 +27,8 @@ export function getAnnotation(filename: string): Set<string> | undefined {
 	if (!annotation) return undefined
 
 	const parsed = JSON.parse(annotation)
-	if (
-		!Object.hasOwn(parsed, 'annotations') ||
-		!Array.isArray(parsed.annotations) ||
-		parsed.annotations.length === 0
-	)
-		return undefined
-	return new Set(parsed.annotations)
+	if (!Object.hasOwn(parsed, 'annotations') || !Array.isArray(parsed.annotations)) return undefined
+	return parsed.annotations.length === 0 ? new Set(['none']) : new Set(parsed.annotations)
 }
 
 function getAnnotations(): Annotation[] {
