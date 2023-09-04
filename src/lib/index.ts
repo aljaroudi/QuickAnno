@@ -1,6 +1,6 @@
 type Annotation = {
 	filename: string
-	annotations: string[]
+	annotations: Set<string>
 }
 
 export async function parseLabels(files: FileList): Promise<Set<string> | undefined> {
@@ -13,15 +13,27 @@ export async function parseLabels(files: FileList): Promise<Set<string> | undefi
 }
 
 export function saveAnnotation(annotation: Annotation) {
-	localStorage.setItem(annotation.filename, JSON.stringify(annotation))
+	localStorage.setItem(
+		annotation.filename,
+		JSON.stringify({
+			filename: annotation.filename,
+			annotations: Array.from(annotation.annotations),
+		})
+	)
 }
 
-export function getAnnotation(filename: string): string[] | undefined {
+export function getAnnotation(filename: string): Set<string> | undefined {
 	const annotation = localStorage.getItem(filename)
 	if (!annotation) return undefined
 
 	const parsed = JSON.parse(annotation)
-	return Object.hasOwn(parsed, 'annotations') ? parsed.annotations : undefined
+	if (
+		!Object.hasOwn(parsed, 'annotations') ||
+		!Array.isArray(parsed.annotations) ||
+		parsed.annotations.length === 0
+	)
+		return undefined
+	return new Set(parsed.annotations)
 }
 
 function getAnnotations(): Annotation[] {
