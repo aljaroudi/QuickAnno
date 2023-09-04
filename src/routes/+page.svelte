@@ -8,11 +8,15 @@
 	let current = {
 		index: -1,
 		filename: '',
-		annotations: <string[]>[],
+		annotations: new Set<string>(),
 	}
 
 	function nextImage(offset: 1 | -1 = 1) {
-		current.filename.length && saveAnnotation(current)
+		current.filename.length &&
+			saveAnnotation({
+				filename: current.filename,
+				annotations: current.annotations,
+			})
 		if (!images?.length) return
 
 		let index = current.index + offset
@@ -22,14 +26,21 @@
 		current = {
 			index,
 			filename: images[index].name,
-			annotations: getAnnotation(images[index].name) ?? [],
+			annotations: getAnnotation(images[index].name) ?? new Set<string>(),
 		}
 	}
 
 	function toggleLabel(label: string) {
-		current.annotations.includes(label)
-			? (current.annotations = current.annotations.filter(l => l !== label))
-			: (current.annotations = [...current.annotations, label])
+		const prev = current.annotations
+		if (label === 'none' && prev.delete('none')) {
+			current.annotations = prev
+		} else if (label === 'none') {
+			current.annotations = new Set(['none'])
+		} else {
+			prev.delete('none')
+			prev.delete(label) || prev.add(label)
+			current.annotations = prev
+		}
 	}
 
 	window.addEventListener('keydown', e => {
@@ -43,6 +54,8 @@
 
 			case 'ArrowRight':
 			case 'ArrowDown':
+			case 'Enter':
+			case ' ':
 				nextImage(1)
 				break
 
@@ -52,8 +65,8 @@
 				break
 
 			default:
-				if (!e.key.match(/[1-9]/)) break
-
+				if (!e.key.match(/[0-9]/)) break
+				if (e.key === '0') toggleLabel('none')
 				const label = [...labels][Number(e.key) - 1]
 				if (label) toggleLabel(label)
 		}
