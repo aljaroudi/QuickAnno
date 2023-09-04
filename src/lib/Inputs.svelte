@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { downloadAnnotations } from '$lib'
-
 	export let labels: Set<string>
 	export let currentLabels: Set<string>
 	export let onClick: (label: string) => void
 	export let totalImages: number
 	export let currentCount: number
+	export let onExport: VoidFunction
 </script>
 
 <div class="flex flex-col gap-2 px-2 w-52">
@@ -40,7 +39,7 @@
 
 	<div class="flex flex-col gap-2 mt-auto">
 		<button
-			on:click={() => downloadAnnotations()}
+			on:click={onExport}
 			class="p-2 text-white transition rounded-lg bg-sky-600 hover:bg-sky-500"
 		>
 			Export
