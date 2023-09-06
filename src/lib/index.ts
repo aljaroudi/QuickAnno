@@ -32,7 +32,7 @@ export function getAnnotation(filename: string): Set<string> | undefined {
 }
 
 function getAnnotations(images: FileList): Annotation[] {
-	const annotations: Annotation[] = Array(images.length)
+	const annotations: Annotation[] = []
 	for (const { name: filename } of images) {
 		const data = localStorage.getItem(filename)
 		if (!data) continue
