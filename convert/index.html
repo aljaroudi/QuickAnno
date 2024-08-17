@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilabel CSV to Create ML</title>
+</head>
+<body style='display: flex; gap: 0.5rem; flex-direction: column; align-items: center;'>
+    <h1><code>Convert Multilabel CSV to Create ML</code></h1>
+    <input type='file' id='file' accept='.csv' onchange='convert(this)'/>
+    <script>
+			/** @param {HTMLInputElement} e */
+			function convert({files}) {
+				if (!files?.[0]) {
+					alert('Please select a file')
+					return
+				}
+
+				const reader = new FileReader()
+				reader.onload = e => {
+					/** @type {string[]} */
+					const lines = e.target.result?.split('\n')
+					if (!lines) {
+						alert('Failed to read file')
+						return
+					}
+		
+					const headers = lines[0].split(', ')
+					const json = Array(lines.length - 1).fill(null)
+					for (let i = 1; i < lines.length; i++) {
+						const [image, ...values] = lines[i].split(', ')
+						const annotations = []
+						for (let j = 1; j < values.length; j++)
+							if (values[j] === '1') annotations.push(headers[j])
+						json[i - 1] = {image, annotations}
+					}
+		
+					const output = JSON.stringify(json.filter(Boolean), null, 2)
+					const url = URL.createObjectURL(new Blob([output], {type: 'application/json'}))
+					const a = document.createElement('a')
+					a.href = url
+					a.download = 'annotations.json'
+					a.click() && a.remove() && URL.revokeObjectURL(url)
+				}
+				reader.readAsText(files[0])
+			}
+    </script>
+</body>
+</html>
